@@ -1,5 +1,5 @@
 //on diit a dart quon veut utiliser du code qui vient dune autre
-
+import 'ProfilePage.dart';
 import 'dart:convert'; // pour lire le JSON
 import 'package:flutter/services.dart'; // pour charger les fichiers dans assets
 import 'package:flutter/material.dart';
@@ -87,8 +87,8 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void _showSaveDialog() {
-    showDialog(
+  Future<void> _showSaveDialog() {
+    return showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(texts["dialogTitle"] ?? "Save Login Info"),
@@ -184,18 +184,31 @@ class _MyHomePageState extends State<MyHomePage> {
 
             // BOUTON LOGIN
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 String password = passwordController.text;
 
-                setState(() {
-                  if (password == "ASDF") {
+                if (password == "ASDF") {
+                  setState(() {
                     imageSource = "assets/light-bulb.webp";
-                  } else {
-                    imageSource = "assets/stop-sign.png";
-                  }
-                });
+                  });
 
-                _showSaveDialog();
+                  await _showSaveDialog();
+
+                  if (!mounted) return;
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Welcome Back ${loginController.text}")),
+                  );
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ProfilePage()),
+                  );
+                } else {
+                  setState(() {
+                    imageSource = "assets/stop-sign.png";
+                  });
+                }
               },
               child: Text(texts["connect"] ?? ""),
             ),
@@ -214,15 +227,3 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-//different case possible in this application
-//cas1 : when application start with no data ==> username = null , password=null, Both TextFields remain empty
-//>> No Snackbar is shown
-
-// cas2: when application starts with saved data
-//>> a snackbar appears saying: "Saved login info loaded"
-
-//cas3: user clicks login and chooses yes in the aletdialog
-//>>a snackbar is shown
-
-//cas4: when clicks login but chooses No
-//>> all saved data is clear , then next time when the application starts textfield will be empty
