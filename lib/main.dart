@@ -197,12 +197,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   if (!mounted) return;
 
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Welcome Back ${loginController.text}")),
+                    SnackBar(content: Text("${texts["welcome"] ?? "Welcome Back"} ${loginController.text}")), // CHANGÉ
                   );
 
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const ProfilePage()),
+                    MaterialPageRoute(builder: (context) => ProfilePage(language: currentLanguage)), // CHANGÉ
                   );
                 } else {
                   setState(() {

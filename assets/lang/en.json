@@ -2,5 +2,18 @@
   "login": "Login",
   "password": "Password",
   "connect": "Login",
-  "switch": "Switch to French"
+  "switch": "Switch to French",
+  "welcome": "Welcome Back",
+  "profileTitle": "Profile Page",
+  "firstName": "First Name",
+  "lastName": "Last Name",
+  "phone": "Phone Number",
+  "email": "Email address",
+  "cannotOpen": "Cannot open this action",
+  "dialogTitle": "Save Login Info",
+  "dialogContent": "Would you like to save your username and password?",
+  "yes": "Yes",
+  "no": "No",
+  "saved": "Login info saved",
+  "savedLoaded": "Saved login info loaded"
 }
