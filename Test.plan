@@ -1,0 +1,12 @@
+//different case possible in this application
+//cas1 : when application start with no data ==> username = null , password=null, Both TextFields remain empty
+//>> No Snackbar is shown
+
+// cas2: when application starts with saved data
+//>>a snackbar appears saying: "Saved login info loaded"
+
+//cas3: user clicks login and chooses yes in the aletdialog
+//>>a snackbar is shown
+
+//cas4: when clicks login but chooses No
+//>> all saved data is clear , then next time when the application starts text field will be empty
