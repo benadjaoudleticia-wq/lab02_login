@@ -1,12 +1,78 @@
-//different case possible in this application
-//cas1 : when application start with no data ==> username = null , password=null, Both TextFields remain empty
-//>> No Snackbar is shown
+TestPlan.txt - Lab 5 (ProfilePage)
+Student: Leticia Benadjaoud
+Project: lab02_login (branch Week5)
 
-// cas2: when application starts with saved data
-//>>a snackbar appears saying: "Saved login info loaded"
+Setup
+- Run the app (Chrome or an Android emulator / real phone).
+- The correct password is ASDF.
 
-//cas3: user clicks login and chooses yes in the aletdialog
-//>>a snackbar is shown
 
-//cas4: when clicks login but chooses No
-//>> all saved data is clear , then next time when the application starts text field will be empty
+TEST 1 - Wrong password
+Steps:
+1. Type any login name.
+2. Type a wrong password (example: 1234).
+3. Click the Login button.
+Expected result:
+- The stop sign image is shown.
+- The app stays on the first page (no navigation, no Snackbar).
+
+TEST 2 - Correct password and navigation
+Steps:
+1. Type the login name "Leticia".
+2. Type the password ASDF.
+3. Click the Login button.
+4. In the Save Login Info dialog, click Yes.
+Expected result:
+- The light bulb image is shown.
+- The app navigates to the ProfilePage.
+- A Snackbar shows "Welcome Back Leticia" (the login name from the first page).
+
+TEST 3 - ProfilePage layout
+Steps:
+1. Look at the ProfilePage after Test 2.
+Expected result:
+- Four TextFields: First Name, Last Name, Phone Number, Email address.
+- Phone Number has two buttons beside it (telephone and SMS).
+- Email address has one button beside it (mail).
+- No layout error (TextFields are inside Flexible).
+
+
+TEST 4 - Telephone button
+Steps:
+1. Type a phone number (example: 6135551234).
+2. Click the telephone button.
+Expected result:
+- The phone dialer opens with that number ("tel:" protocol).
+- If the field is empty, nothing happens.
+(Note: on a computer browser this cannot open, so test on an emulator or phone.)
+
+
+TEST 5 - SMS button
+Steps:
+1. Type a phone number.
+2. Click the SMS button.
+Expected result:
+- The text messaging application opens for that number ("sms:" protocol).
+
+
+TEST 6 - Email button
+Steps:
+1. Type an email address (example: test@example.com).
+2. Click the mail button.
+Expected result:
+- The email program opens with a new email addressed to that address
+  ("mailto:" protocol).
+
+
+TEST 7 - Data is saved and loaded (repository)
+Steps:
+1. On the ProfilePage, type a first name, last name, phone number and email.
+2. Close the app completely.
+3. Run the app again, log in with ASDF and click Yes in the dialog.
+Expected result:
+- The four TextFields are already filled with the values typed before.
+- The data was saved by saveData() when the text changed (addListener)
+  and loaded by loadData() when the app started.
+
+TEST 8 - Translation on the first page and ProfilePage
+- All texts switch to English, and back to French when clicked again.

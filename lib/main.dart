@@ -55,7 +55,9 @@ class _ProfilePageState extends State<ProfilePage> {
     });
     lastNameController.addListener(() {
       DataRepository.lastName = lastNameController.text;
+
       DataRepository.saveData();
+
     });
     phoneController.addListener(() {
       DataRepository.phone = phoneController.text;
