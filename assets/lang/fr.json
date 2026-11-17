@@ -15,5 +15,13 @@
   "yes": "Oui",
   "no": "Non",
   "saved": "Informations sauvegardées",
-  "savedLoaded": "Informations sauvegardées chargées"
+  "savedLoaded": "Informations sauvegardées chargées",
+  "contactList": "Liste de contacts",
+  "phoneNumber": "Téléphone",
+  "enter": "Ajouter",
+  "noContacts": "Il n'y a aucun contact dans la liste",
+  "deleteContact": "Supprimer le contact",
+  "deleteConfirm": "Voulez-vous vraiment supprimer ce contact ?"
+
+
 }

@@ -1,185 +1,247 @@
-import 'dart:convert';
+//on diit a dart quon veut utiliser du code qui vient dune autre
+import 'ProfilePage.dart';
+import 'DataRepository.dart';
+import 'ListPage.dart'; // app du LAB 6
+import 'dart:convert'; // pour lire le JSON
+import 'package:flutter/services.dart'; // pour charger les fichiers dans assets
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'DataRepository.dart'; // CHANGÉ
+import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
 
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key, required this.language});
-
-  final String language;
-
-  @override
-  State<ProfilePage> createState() => _ProfilePageState();
+void main() {
+  runApp(const MyApp());
 }
 
-class _ProfilePageState extends State<ProfilePage> {
-  final TextEditingController firstNameController = TextEditingController();
-  final TextEditingController lastNameController = TextEditingController();
-  final TextEditingController phoneController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
+// StatelessWidget means na pas detat qui change  donc myapp aussi
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
-  late String currentLanguage;
+  //  the root of my application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+      ),
+      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+    );
+  }
+}
+
+//StatefulWidget cest un widget qui a un etat qui peut changer var qui bougent
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key, required this.title});
+  final String title;
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+//this class controlle myhomepage
+class _MyHomePageState extends State<MyHomePage> {
+  final TextEditingController loginController = TextEditingController(); // read/modifier
+  final TextEditingController passwordController = TextEditingController();
+
+  String currentLanguage = "EN";
+  String imageSource = "assets/question-mark.webp";
+
+  // ici on va stocker les textes du fichier JSON
   Map<String, dynamic> texts = {};
 
+  // fonction pour charger un fichier JSON dans assets/lang/
   Future<Map<String, dynamic>> loadLanguageFile(String langCode) async {
     String data = await rootBundle.loadString('assets/lang/$langCode.json');
     return jsonDecode(data);
   }
 
-  String translate(String key) {
-    return (texts[key] ?? "").toString();
-  }
-
+  // charger EN.json au démarrage
   @override
   void initState() {
     super.initState();
-    currentLanguage = widget.language;
-    loadLanguageFile(currentLanguage).then((value) {
-      if (!mounted) return;
+    loadLanguageFile("EN").then((value) {
       setState(() {
         texts = value;
       });
-    });
-
-    // CHANGÉ : on remplit les champs avec les données du repository
-    firstNameController.text = DataRepository.firstName;
-    lastNameController.text = DataRepository.lastName;
-    phoneController.text = DataRepository.phone;
-    emailController.text = DataRepository.email;
-
-    // CHANGÉ : à chaque changement de texte, on sauvegarde
-    firstNameController.addListener(() {
-      DataRepository.firstName = firstNameController.text;
-      DataRepository.saveData();
-    });
-    lastNameController.addListener(() {
-      DataRepository.lastName = lastNameController.text;
-
-      DataRepository.saveData();
-
-    });
-    phoneController.addListener(() {
-      DataRepository.phone = phoneController.text;
-      DataRepository.saveData();
-    });
-    emailController.addListener(() {
-      DataRepository.email = emailController.text;
-      DataRepository.saveData();
+    }).catchError((error) {
+      print("Erreur de chargement JSON : $error");
+    }).whenComplete(() {
+      _loadSavedLogin(); //appel de ma fonction ajouter pour charger les donner sauvgarder ,lab4
+      DataRepository.loadData(); //charge les donnees du profil au lancement
     });
   }
 
-  Future<void> _switchLanguage() async {
-    String newLang = currentLanguage == "EN" ? "FR" : "EN";
-    Map<String, dynamic> loadedTexts = await loadLanguageFile(newLang);
+  //function to save the data from the log in lab4
+  void _loadSavedLogin() async {
+    final prefs = EncryptedSharedPreferences();
+    String? savedUser = await prefs.getString("username");
+    String? savedPass = await prefs.getString("password");
 
-    if (!mounted) return;
-    setState(() {
-      currentLanguage = newLang;
-      texts = loadedTexts;
-    });
-  }
+    if (savedUser != null && savedUser.isNotEmpty && savedPass != null && savedPass.isNotEmpty) {
+      loginController.text = savedUser;
+      passwordController.text = savedPass;
 
-  @override
-  void dispose() {
-    firstNameController.dispose();
-    lastNameController.dispose();
-    phoneController.dispose();
-    emailController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _launch(String scheme, String value) async {
-    if (value.isEmpty) return;
-
-    final Uri uri = Uri(scheme: scheme, path: value);
-    final bool opened = await launchUrl(uri);
-
-    if (!opened && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(translate("cannotOpen"))),
-      );
+      // lancer le Snackbar apres que la page soit prete
+      Future.delayed(Duration.zero, () {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(texts["savedLoaded"] ?? "Saved login info loaded")),
+        );
+      });
     }
   }
 
+  Future<void> _showSaveDialog() {
+    return showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(texts["dialogTitle"] ?? "Save Login Info"),
+        content: Text(texts["dialogContent"] ?? "Would you like to save your username and password?"),
+        actions: [
+          TextButton(
+            child: Text(texts["no"] ?? "No"),
+            onPressed: () async {
+              final prefs = EncryptedSharedPreferences();
+              await prefs.clear(); //efacer les donnees
+              Navigator.pop(dialogContext);
+            },
+          ),
+          TextButton(
+            child: Text(texts["yes"] ?? "Yes"),
+            onPressed: () async {
+              final prefs = EncryptedSharedPreferences();
+              await prefs.setString("username", loginController.text);
+              await prefs.setString("password", passwordController.text);
+
+              if (!mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(texts["saved"] ?? "Login info saved")),
+              );
+
+              Navigator.pop(dialogContext);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  //methode of building homepage
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(translate("profileTitle")),
+        title: Text(widget.title),
+
+        //  Buton for switch lang
         actions: [
           TextButton(
-            onPressed: _switchLanguage,
+            onPressed: () async {
+              String newLang = currentLanguage == "EN" ? "FR" : "EN";
+
+              //  le fichier JSON correspondant
+              Map<String, dynamic> loadedTexts =
+              await loadLanguageFile(newLang);
+
+              setState(() {
+                currentLanguage = newLang;
+                texts = loadedTexts;
+              });
+            },
             child: Text(
-              translate("switch"),
-              style: const TextStyle(fontSize: 18),
+              texts["switch"] ?? "",
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+              ),
             ),
+          ),
+
+          // LAB 6 : bouton pour ouvrir ListPage
+          IconButton(
+            icon: const Icon(Icons.list),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ListPage(),
+                ),
+              );
+            },
           ),
         ],
       ),
+
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            const SizedBox(height: 16),
+
+            //  LOGIN
             TextField(
-              controller: firstNameController,
+              controller: loginController,
               decoration: InputDecoration(
-                labelText: translate("firstName"),
-                border: const OutlineInputBorder(),
+                labelText: texts["login"] ?? "",
               ),
             ),
+
             const SizedBox(height: 16),
+
+            //  PASSWORD
             TextField(
-              controller: lastNameController,
+              controller: passwordController,
+              obscureText: true, //cache le texte
               decoration: InputDecoration(
-                labelText: translate("lastName"),
-                border: const OutlineInputBorder(),
+                labelText: texts["password"] ?? "",
               ),
             ),
+
             const SizedBox(height: 16),
-            Row(
-              children: [
-                Flexible(
-                  child: TextField(
-                    controller: phoneController,
-                    keyboardType: TextInputType.phone,
-                    decoration: InputDecoration(
-                      labelText: translate("phone"),
-                      border: const OutlineInputBorder(),
+
+            // BOUTON LOGIN
+            ElevatedButton(
+              onPressed: () async {
+                String password = passwordController.text;
+
+                if (password == "ASDF") {
+                  setState(() {
+                    imageSource = "assets/light-bulb.webp";
+                  });
+
+                  await _showSaveDialog();
+
+                  if (!mounted) return;
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("${texts["welcome"] ?? "Welcome Back"} ${loginController.text}")),
+                  );
+
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfilePage(
+                        language: currentLanguage,
+                        username: loginController.text,
+                      ),
                     ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () => _launch('tel', phoneController.text),
-                  child: const Icon(Icons.phone),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () => _launch('sms', phoneController.text),
-                  child: const Icon(Icons.sms),
-                ),
-              ],
+                  );
+                } else {
+                  setState(() {
+                    imageSource = "assets/stop-sign.png";
+                  });
+                }
+              },
+              child: Text(texts["connect"] ?? ""),
             ),
+
             const SizedBox(height: 16),
-            Row(
-              children: [
-                Flexible(
-                  child: TextField(
-                    controller: emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      labelText: translate("email"),
-                      border: const OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () => _launch('mailto', emailController.text),
-                  child: const Icon(Icons.mail),
-                ),
-              ],
+
+            // IMAGE
+            SizedBox(
+              width: 300,
+              height: 300,
+              child: Image.asset(imageSource),
             ),
           ],
         ),
