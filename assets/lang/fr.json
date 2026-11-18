@@ -2,5 +2,26 @@
   "login": "Connexion",
   "password": "Mot de passe",
   "connect": "Se connecter",
-  "switch": "Changer en anglais"
+  "switch": "Changer en anglais",
+  "welcome": "Bon retour",
+  "profileTitle": "Page de profil",
+  "firstName": "Prénom",
+  "lastName": "Nom de famille",
+  "phone": "Numéro de téléphone",
+  "email": "Adresse courriel",
+  "cannotOpen": "Impossible d'ouvrir cette action",
+  "dialogTitle": "Sauvegarder les informations",
+  "dialogContent": "Voulez-vous sauvegarder votre nom d'utilisateur et votre mot de passe ?",
+  "yes": "Oui",
+  "no": "Non",
+  "saved": "Informations sauvegardées",
+  "savedLoaded": "Informations sauvegardées chargées",
+  "contactList": "Liste de contacts",
+  "phoneNumber": "Téléphone",
+  "enter": "Ajouter",
+  "noContacts": "Il n'y a aucun contact dans la liste",
+  "deleteContact": "Supprimer le contact",
+  "deleteConfirm": "Voulez-vous vraiment supprimer ce contact ?"
+
+
 }

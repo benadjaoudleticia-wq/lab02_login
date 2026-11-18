@@ -1,12 +1,19 @@
-//different case possible in this application
-//cas1 : when application start with no data ==> username = null , password=null, Both TextFields remain empty
-//>> No Snackbar is shown
+cas1 :Login
+-Wrong password --> stay on first page.
+-Correct password (ASDF) --> Snackbar + navigate to ProfilePage.
 
-// cas2: when application starts with saved data
-//>>a snackbar appears saying: "Saved login info loaded"
+cas2 : ProfilePage Layout
+-Four fields (First, Last, Phone, Email).
+-Phone: Call + SMS buttons.
+-Email: Mail button.
 
-//cas3: user clicks login and chooses yes in the aletdialog
-//>>a snackbar is shown
+cas3: URL Buttons
+-[Looks like the result wasn't safe to show. Let's switch things up and try something else!],
+ sms:, mailto: open correct apps.
+-If unsupported → AlertDialog.
 
-//cas4: when clicks login but chooses No
-//>> all saved data is clear , then next time when the application starts text field will be empty
+cas4: Save & Load Data
+-Edit fields -->close app -->reopen -->data restored
+
+cas5 : Language Switch
+-All text switches EN /FR

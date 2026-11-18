@@ -1,9 +1,10 @@
 //on diit a dart quon veut utiliser du code qui vient dune autre
-
+import 'ProfilePage.dart';
+import 'DataRepository.dart';
+import 'ListPage.dart'; // app du LAB 6
 import 'dart:convert'; // pour lire le JSON
 import 'package:flutter/services.dart'; // pour charger les fichiers dans assets
 import 'package:flutter/material.dart';
-//library ajouter pour que mon application puisse sauvgarder les donnees , lab4
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
 
 void main() {
@@ -65,9 +66,11 @@ class _MyHomePageState extends State<MyHomePage> {
       print("Erreur de chargement JSON : $error");
     }).whenComplete(() {
       _loadSavedLogin(); //appel de ma fonction ajouter pour charger les donner sauvgarder ,lab4
+      DataRepository.loadData(); //charge les donnees du profil au lancement
     });
   }
-//function to save the data from the log in lab4
+
+  //function to save the data from the log in lab4
   void _loadSavedLogin() async {
     final prefs = EncryptedSharedPreferences();
     String? savedUser = await prefs.getString("username");
@@ -87,8 +90,8 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void _showSaveDialog() {
-    showDialog(
+  Future<void> _showSaveDialog() {
+    return showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(texts["dialogTitle"] ?? "Save Login Info"),
@@ -152,6 +155,19 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
           ),
+
+          // LAB 6 : bouton pour ouvrir ListPage
+          IconButton(
+            icon: const Icon(Icons.list),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ListPage(),
+                ),
+              );
+            },
+          ),
         ],
       ),
 
@@ -184,18 +200,37 @@ class _MyHomePageState extends State<MyHomePage> {
 
             // BOUTON LOGIN
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 String password = passwordController.text;
 
-                setState(() {
-                  if (password == "ASDF") {
+                if (password == "ASDF") {
+                  setState(() {
                     imageSource = "assets/light-bulb.webp";
-                  } else {
-                    imageSource = "assets/stop-sign.png";
-                  }
-                });
+                  });
 
-                _showSaveDialog();
+                  await _showSaveDialog();
+
+                  if (!mounted) return;
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("${texts["welcome"] ?? "Welcome Back"} ${loginController.text}")),
+                  );
+
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfilePage(
+                        language: currentLanguage,
+                        username: loginController.text,
+                      ),
+                    ),
+                  );
+                } else {
+                  setState(() {
+                    imageSource = "assets/stop-sign.png";
+                  });
+                }
               },
               child: Text(texts["connect"] ?? ""),
             ),
@@ -214,15 +249,3 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-//different case possible in this application
-//cas1 : when application start with no data ==> username = null , password=null, Both TextFields remain empty
-//>> No Snackbar is shown
-
-// cas2: when application starts with saved data
-//>> a snackbar appears saying: "Saved login info loaded"
-
-//cas3: user clicks login and chooses yes in the aletdialog
-//>>a snackbar is shown
-
-//cas4: when clicks login but chooses No
-//>> all saved data is clear , then next time when the application starts textfield will be empty
