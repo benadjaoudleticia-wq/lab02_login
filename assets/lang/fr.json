@@ -21,7 +21,8 @@
   "enter": "Ajouter",
   "noContacts": "Il n'y a aucun contact dans la liste",
   "deleteContact": "Supprimer le contact",
-  "deleteConfirm": "Voulez-vous vraiment supprimer ce contact ?"
-
+  "deleteConfirm": "Voulez-vous vraiment supprimer ce contact ?",
+  "delete": "Supprimer",
+  "close": "Fermer"
 
 }

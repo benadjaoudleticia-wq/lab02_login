@@ -16,11 +16,13 @@
   "no": "No",
   "saved": "Login info saved",
   "savedLoaded": "Saved login info loaded",
-
   "contactList": "Contact List",
   "phoneNumber": "Phone Number",
   "enter": "Enter",
   "noContacts": "There are no contacts in the list",
   "deleteContact": "Delete Contact",
-  "deleteConfirm": "Are you sure you want to delete this contact?"
+  "deleteConfirm": "Are you sure you want to delete this contact?",
+
+  "delete": "Delete",
+  "close": "Close"
 }
